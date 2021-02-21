@@ -150,6 +150,7 @@ on_install() {
   ui_print "Contacts (CONTACTS)"
   ui_print "Music Player (MUSIC)"
   ui_print "Mute/Unmute Media Volume (VOLUME_MUTE)"
+  ui_print "Wake phone (POWER)"
   ui_print "Play/Pause Media (MEDIA_PLAY_PAUSE)"
   ui_print "Next Media (MEDIA_NEXT)"
   ui_print "Recent Apps (APP_SWITCH)"
@@ -169,6 +170,8 @@ on_install() {
   [ -z "$CHOICE" ] && q_and_a CALL CONTACTS Other
   q_and_a 
   [ -z "$CHOICE" ] && q_and_a MUSIC VOLUME_MUTE Other
+  q_and_a
+  [ -z "$CHOICE" ] && q_and_a POWER VOLUME_MUTE Other
   q_and_a 
   [ -z "$CHOICE" ] && q_and_a MEDIA_PLAY_PAUSE MEDIA_NEXT Other
   q_and_a 
