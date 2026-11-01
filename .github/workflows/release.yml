@@ -36,7 +36,12 @@ jobs:
             echo "::error::tag $GITHUB_REF_NAME does not match module.prop version $version"
             exit 1
           fi
+          version_code=$(sed -n 's/^versionCode=//p' module.prop | head -n1 | tr -d '\r')
+          case "$version_code" in
+            ''|*[!0-9]*) echo "::error::invalid versionCode in module.prop"; exit 1 ;;
+          esac
           echo "version=$version" >> "$GITHUB_OUTPUT"
+          echo "version_code=$version_code" >> "$GITHUB_OUTPUT"
 
       - name: Build flashable zip
         id: package
@@ -51,10 +56,32 @@ jobs:
           unzip -l "$zip_name"
           echo "zip_name=$zip_name" >> "$GITHUB_OUTPUT"
 
+      - name: Generate update.json
+        id: update
+        env:
+          VERSION: ${{ steps.version.outputs.version }}
+          VERSION_CODE: ${{ steps.version.outputs.version_code }}
+        run: |
+          set -euo pipefail
+          zip_name="XiaomiAI-remap-${VERSION}.zip"
+          zip_url="https://github.com/${GITHUB_REPOSITORY}/releases/download/${GITHUB_REF_NAME}/${zip_name}"
+          changelog_url="https://raw.githubusercontent.com/${GITHUB_REPOSITORY}/${GITHUB_REF_NAME}/CHANGELOG.md"
+          jq -n \
+            --arg version "$VERSION" \
+            --argjson versionCode "$VERSION_CODE" \
+            --arg zipUrl "$zip_url" \
+            --arg changelog "$changelog_url" \
+            '{version: $version, versionCode: $versionCode, zipUrl: $zipUrl, changelog: $changelog}' \
+            > update.json
+          jq . update.json
+          echo "update_json=update.json" >> "$GITHUB_OUTPUT"
+
       - name: Publish release
         uses: softprops/action-gh-release@v2
         with:
           name: ${{ steps.version.outputs.version }}
-          files: ${{ steps.package.outputs.zip_name }}
+          files: |
+            ${{ steps.package.outputs.zip_name }}
+            ${{ steps.update.outputs.update_json }}
           generate_release_notes: true
           fail_on_unmatched_files: true
