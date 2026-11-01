@@ -1,7 +1,8 @@
 # Mi AI Button Remapper
 
 A Magisk module that remaps the dedicated **Mi AI hardware button** of the
-Xiaomi **Mi 9 (cepheus)** and **Mi Mix 3 (perseus)** to one of 16 functions.
+Xiaomi **Mi 9 (cepheus)** and **Mi Mix 3 (perseus)** to one of 16 remappable
+functions (plus the stock AI behaviour on MIUI).
 
 Modernized fork of [Cr0wTom/MiAI-remap](https://github.com/Cr0wTom/MiAI-remap)
 (XDA thread: <https://forum.xda-developers.com/Mi-9/themes/mod-mi-ai-button-remapper-t3918291>).
@@ -56,15 +57,46 @@ All labels are valid AOSP keylayout labels. Whether an app-launch key
 (CONTACTS, MUSIC, ...) actually opens the app depends on the ROM - on MIUI
 they work like in the original module.
 
+## Troubleshooting
+
+- **Remap has no effect after reboot:** check whether your ROM reads the
+  keylayout from the vendor partition instead (Android checks `/vendor`
+  before `/system`):
+
+```sh
+adb shell "ls -l /system/usr/keylayout/gpio-keys.kl /vendor/usr/keylayout/gpio-keys.kl"
+```
+
+  If the file exists in `/vendor`, please open an issue - the module then
+  needs to overlay the vendor copy as well.
+
 ## Building the zip
 
 ```sh
 git clone https://github.com/Imacikus/MiAI-remap.git
 cd MiAI-remap
-zip -r9 ../XiaomiAI-remap-v1.0.0.zip module.prop customize.sh action.sh system
+zip -r9 ../XiaomiAI-remap-v1.0.1.zip module.prop customize.sh action.sh mai-common.sh system
 ```
 
 ## Changelog
+
+**2026-11-01: v1.0.1** - review fixes
+
+- Shared logic (`CHOICES`, `desc`, `apply_label`, MIUI check) moved into
+  `mai-common.sh`; `customize.sh` and `action.sh` source it, so the two can
+  no longer drift apart.
+- The keylayout is now shipped **without** the `key 689` line; the installer
+  adds the proper mapping. The shipped file is therefore valid even if
+  `customize.sh` is ever skipped (the MIUI-only `AI` label used to make the
+  whole file unparseable on AOSP ROMs).
+- Module id is derived from `$MODPATH` instead of being hardcoded.
+- Cycle order fixed: stock AI now comes **before** "No function";
+  `NONE` is always the last state (wrap-around goes to `CAMERA`).
+- Permissions are re-applied after `sed -i` rewrites the keylayout, and
+  `action.sh`/`mai-common.sh` are made executable at install time
+  (the GitHub API stores them as 0644).
+- The installer warns when `/vendor/usr/keylayout/gpio-keys.kl` exists, since
+  Android reads keylayouts from `/vendor` before `/system`.
 
 **2026-11-01: v1.0.0** - modernized fork
 
@@ -79,9 +111,6 @@ zip -r9 ../XiaomiAI-remap-v1.0.0.zip module.prop customize.sh action.sh system
   removed properly.
 - Removed `QPANEL_ON_OFF` (also not a valid AOSP label) and replaced it with
   `NOTIFICATION`.
-- AOSP-based ROMs: `AI` is a MIUI-only keycode, so the module now keeps the
-  keylayout valid there (key disabled by default instead of shipping a file
-  that fails to parse).
 - Device check now also accepts `ro.product.device` (custom ROMs often
   change `ro.product.name`) and no longer uses `break` outside a loop.
 - The selection survives module updates; scripted selection via
