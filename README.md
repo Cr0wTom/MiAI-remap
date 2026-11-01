@@ -82,10 +82,32 @@ adb shell "ls -l /system/usr/keylayout/gpio-keys.kl /vendor/usr/keylayout/gpio-k
 ```sh
 git clone https://github.com/Imacikus/MiAI-remap.git
 cd MiAI-remap
-zip -r9 ../XiaomiAI-remap-v1.0.1.zip module.prop customize.sh action.sh mai-common.sh system
+zip -r9 ../XiaomiAI-remap-v1.0.2.zip module.prop customize.sh action.sh mai-common.sh system
 ```
 
+### Automatic releases (CI)
+
+Pushing a tag builds the zip on GitHub Actions and attaches it to a GitHub
+release:
+
+```sh
+git tag v1.0.2 && git push origin v1.0.2
+```
+
+The tag must match the `version` in `module.prop`, otherwise the build
+fails on purpose. The release contains exactly `module.prop`,
+`customize.sh`, `action.sh`, `mai-common.sh` and `system/`.
+
 ## Changelog
+
+**2026-11-01: v1.0.2**
+
+- `action.sh`: a stale `AI` entry in the config (from an earlier MIUI
+  install) is now normalized to `NONE` on AOSP-based ROMs, so the
+  "Previous" output stays accurate.
+- CI: added `.github/workflows/release.yml` - pushing a `v*` tag builds the
+  flashable zip (with `sh -n` validation and a tag/`module.prop` version
+  check) and attaches it to a GitHub release.
 
 **2026-11-01: v1.0.1** - review fixes
 

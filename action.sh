@@ -24,6 +24,12 @@ KL="$MODDIR/system/usr/keylayout/gpio-keys.kl"
 current=$(head -n1 "$CFG" 2>/dev/null | tr -d '[:space:]')
 [ -n "$current" ] || current=NONE
 
+# Stale 'AI' from a previous MIUI install: normalize on AOSP-based ROMs so
+# the "Previous" output stays accurate (the cycle falls back to CAMERA anyway).
+if [ "$current" = "AI" ] && ! is_miui; then
+  current=NONE
+fi
+
 target=""
 
 # Direct selection via config file (for automation / remote shells)

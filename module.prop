@@ -1,6 +1,6 @@
 id=XiaomiAI-remap
 name=Xiaomi AI Button Remapper
-version=v1.0.1
-versionCode=11
+version=v1.0.2
+versionCode=12
 author=Imacikus (original: Cr0wTom)
 description=Remaps the dedicated AI button on Xiaomi Mi 9 (cepheus) and Mi Mix 3 (perseus) to 1 of 16 functions. Install from the Magisk app, then tap "Action" on the module card to cycle functions and reboot.
