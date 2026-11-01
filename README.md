@@ -7,6 +7,9 @@ functions (plus the stock AI behaviour on MIUI).
 Modernized fork of [Cr0wTom/MiAI-remap](https://github.com/Cr0wTom/MiAI-remap)
 (XDA thread: <https://forum.xda-developers.com/Mi-9/themes/mod-mi-ai-button-remapper-t3918291>).
 
+**Status:** verified working on a Mi 9 (cepheus) with xiaomi.eu MIUI on
+current Magisk.
+
 ## How it works
 
 The module overlays `/system/usr/keylayout/gpio-keys.kl` with a patched copy
@@ -59,16 +62,20 @@ they work like in the original module.
 
 ## Troubleshooting
 
-- **Remap has no effect after reboot:** check whether your ROM reads the
-  keylayout from the vendor partition instead (Android checks `/vendor`
-  before `/system`):
+- **Remap has no effect after reboot:** the module overlays
+  `/system/usr/keylayout/gpio-keys.kl`. On a Mi 9 with xiaomi.eu MIUI this
+  was verified: the ROM reads the keylayout from `/system`, so the overlay
+  works as-is and no vendor overlay is needed. Other ROMs may ship the file
+  in the vendor partition (Android checks `/vendor` before `/system`);
+  check with:
 
 ```sh
 adb shell "ls -l /system/usr/keylayout/gpio-keys.kl /vendor/usr/keylayout/gpio-keys.kl"
 ```
 
   If the file exists in `/vendor`, please open an issue - the module then
-  needs to overlay the vendor copy as well.
+  needs to overlay the vendor copy as well. The installer also prints a
+  warning when it detects this situation.
 
 ## Building the zip
 
@@ -82,7 +89,7 @@ zip -r9 ../XiaomiAI-remap-v1.0.1.zip module.prop customize.sh action.sh mai-comm
 
 **2026-11-01: v1.0.1** - review fixes
 
-- Shared logic (`CHOICES`, `desc`, `apply_label`, MIUI check) moved into
+- Shared logic (`FUNCTIONS`, `desc`, `apply_label`, MIUI check) moved into
   `mai-common.sh`; `customize.sh` and `action.sh` source it, so the two can
   no longer drift apart.
 - The keylayout is now shipped **without** the `key 689` line; the installer
@@ -97,6 +104,9 @@ zip -r9 ../XiaomiAI-remap-v1.0.1.zip module.prop customize.sh action.sh mai-comm
   (the GitHub API stores them as 0644).
 - The installer warns when `/vendor/usr/keylayout/gpio-keys.kl` exists, since
   Android reads keylayouts from `/vendor` before `/system`.
+- Verified on a real Mi 9 (xiaomi.eu MIUI): the keylayout lives in `/system`,
+  so the module's overlay approach is correct for this ROM and no vendor
+  overlay is needed.
 
 **2026-11-01: v1.0.0** - modernized fork
 
