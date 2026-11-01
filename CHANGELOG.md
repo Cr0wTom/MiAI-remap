@@ -1,5 +1,14 @@
 # Changelog
 
+## 2026-11-01: v1.0.4
+
+- The installer output now mentions that the "Action" button may only show
+  up on the module card after a reboot (the Magisk app refreshes the module
+  list at boot). Confirmed on-device on a Mi 9.
+- README: same hint added to "How it works"; VOICE_ASSIST is now marked as
+  depending on a configured default assistant app (with e.g. Home Assistant
+  set as assistant, the keycode may not be handled by anything).
+
 ## 2026-11-01: v1.0.3
 
 - `module.prop` now contains an `updateJson` pointing at

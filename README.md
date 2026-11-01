@@ -21,6 +21,10 @@ just the file overlay.
    function and prints the selection in the console.
 3. **Reboot**. Done.
 
+Note: if the **Action** button does not show up on the module card right
+after installing, reboot once - it appears once the module list is refreshed
+at boot.
+
 Your selection survives module updates. To go back to the stock AI assistant,
 cycle to *Stock AI button (MIUI)* (MIUI only) or simply disable/uninstall the
 module and reboot.
@@ -41,13 +45,13 @@ echo "SYSRQ" > /data/local/tmp/miai_choice
 | Camera | `CAMERA` | |
 | Screenshot | `SYSRQ` | |
 | Google Search | `SEARCH` | |
-| Voice Assistant | `VOICE_ASSIST` | |
+| Voice Assistant | `VOICE_ASSIST` | Needs a configured default assistant app |
 | Dialer | `CALL` | |
 | Contacts | `CONTACTS` | App-launch key; needs ROM support |
 | Music player | `MUSIC` | App-launch key; needs ROM support |
 | Mute/unmute media | `VOLUME_MUTE` | |
-| Play/pause media | `MEDIA_PLAY_PAUSE` | |
-| Next media track | `MEDIA_NEXT` | |
+| Play/pause media | `MEDIA_PLAY_PAUSE` | Works with the active media session |
+| Next media track | `MEDIA_NEXT` | Works with the active media session |
 | Recent apps | `APP_SWITCH` | |
 | Notification shade / Quick Settings | `NOTIFICATION` | Replaces the old `QPANEL_ON_OFF` |
 | Browser | `EXPLORER` | App-launch key; needs ROM support |
@@ -58,7 +62,8 @@ echo "SYSRQ" > /data/local/tmp/miai_choice
 
 All labels are valid AOSP keylayout labels. Whether an app-launch key
 (CONTACTS, MUSIC, ...) actually opens the app depends on the ROM - on MIUI
-they work like in the original module.
+they work like in the original module. VOICE_ASSIST only does something if a
+digital assistant app is configured as the default assistant.
 
 ## Troubleshooting
 
@@ -77,12 +82,16 @@ adb shell "ls -l /system/usr/keylayout/gpio-keys.kl /vendor/usr/keylayout/gpio-k
   needs to overlay the vendor copy as well. The installer also prints a
   warning when it detects this situation.
 
+- **A function does nothing:** some functions need a handler on the ROM side
+  (see the "Notes" column above). Media keys (`MEDIA_PLAY_PAUSE`,
+  `MEDIA_NEXT`) always work with the currently active media session.
+
 ## Building the zip
 
 ```sh
 git clone https://github.com/Imacikus/MiAI-remap.git
 cd MiAI-remap
-zip -r9 ../XiaomiAI-remap-v1.0.3.zip module.prop customize.sh action.sh mai-common.sh system
+zip -r9 ../XiaomiAI-remap-v1.0.4.zip module.prop customize.sh action.sh mai-common.sh system
 ```
 
 ### Automatic releases (CI)
@@ -91,7 +100,7 @@ Pushing a tag builds the zip on GitHub Actions and attaches it to a GitHub
 release:
 
 ```sh
-git tag v1.0.3 && git push origin v1.0.3
+git tag v1.0.4 && git push origin v1.0.4
 ```
 
 The tag must match the `version` in `module.prop`, otherwise the build

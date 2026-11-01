@@ -87,3 +87,7 @@ set_perm "$MODPATH/action.sh" 0 0 0755
 ui_print ""
 ui_print "- Installed. Tap 'Action' on the module card in the Magisk app"
 ui_print "  to cycle through the available functions, then reboot to apply."
+ui_print ""
+ui_print "- NOTE: if the 'Action' button does not show up on the module card"
+ui_print "  right away, reboot once - it appears after the module list is"
+ui_print "  refreshed at boot."
